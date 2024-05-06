@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  # Laravel Application
+  app:
+    build:
+      context: ./laravel
+      dockerfile: Dockerfile
+    container_name: laravel-app
+    volumes:
+      - ./laravel:/var/www/html
+    ports:
+      - "8080:80"
+    environment:
+      - APACHE_DOCUMENT_ROOT=/var/www/html/public
+    depends_on:
+      - mysql
+    networks:
+      - laravel-net
+    image: bulutbilisim.azurecr.io/docker-repo
+  # phpmyadmin
+  phpmyadmin:
+    depends_on:
+      - mysql
+    image: phpmyadmin
+    restart: always
+    ports:
+      - "8090:80"
+    environment:
+      - PMA_ARBITRARY=1
+
+    networks:
+      - laravel-net
+
+  # MySQL Database
+  mysql:
+    image: mysql:latest
+    container_name: laravel-mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: bulut
+      MYSQL_USER: burhan
+      MYSQL_PASSWORD: 123456
+    networks:
+      - laravel-net
+
+networks:
+  laravel-net:
